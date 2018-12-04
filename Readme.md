@@ -1,111 +1,69 @@
 <div align="center" markdown="1">
 
-<img src="https://d3vv6lp55qjaqc.cloudfront.net/items/2D2K45312x0M1q2C0a3P/jest-logo.svg" width="200">
+  <img src="https://d3vv6lp55qjaqc.cloudfront.net/items/2D2K45312x0M1q2C0a3P/jest-logo.svg" width="200">
 
-<h1>Jest cheat sheet</h1>
+  <h1>Jest 小抄</h1>
 
 </div>
 
-_I recommend [Mrm](https://github.com/sapegin/mrm-tasks/tree/master/packages/mrm-task-jest) and [jest-codemods](https://github.com/skovhus/jest-codemods) for single-command Jest installation and easy migration from other frameworks._
-
-<!-- To reformat run: npx prettier --print-width 100 --single-quote --no-semi --prose-wrap never --write Readme.md -->
-
-<!-- To update TOC run: npx markdown-toc --maxdepth 3 -i Readme.md -->
-
-<!-- toc -->
-
-- [Test structure](#test-structure)
-- [Matchers](#matchers)
-  - [Basic matchers](#basic-matchers)
-  - [Truthiness](#truthiness)
-  - [Numbers](#numbers)
-  - [Strings](#strings)
-  - [Arrays](#arrays)
-  - [Objects](#objects)
-  - [Exceptions](#exceptions)
-  - [Snapshots](#snapshots)
-  - [Mock functions](#mock-functions)
-  - [Misc](#misc)
-  - [Promise matchers (Jest 20+)](#promise-matchers-jest-20)
-- [Async tests](#async-tests)
-  - [async/await](#asyncawait)
-  - [Promises](#promises)
-  - [done() callback](#done-callback)
-- [Mocks](#mocks)
-  - [Mock functions](#mock-functions-1)
-  - [Mock modules using `jest.mock` method](#mock-modules-using-jestmock-method)
-  - [Mock modules using a mock file](#mock-modules-using-a-mock-file)
-  - [Mock object methods](#mock-object-methods)
-  - [Mock getters and setters (Jest 22.1.0+)](#mock-getters-and-setters-jest-2210)
-  - [Mock getters and setters](#mock-getters-and-setters)
-  - [Clearing and restoring mocks](#clearing-and-restoring-mocks)
-  - [Accessing the original module when using mocks](#accessing-the-original-module-when-using-mocks)
-  - [Timer mocks](#timer-mocks)
-- [Data-driven tests (Jest 23+)](#data-driven-tests-jest-23)
-- [Skipping tests](#skipping-tests)
-- [Testing modules with side effects](#testing-modules-with-side-effects)
-- [Usage with Babel and TypeScript](#usage-with-babel-and-typescript)
-- [Resources](#resources)
-- [You may also like](#you-may-also-like)
-- [Contributing](#contributing)
-- [Author and license](#author-and-license)
-
-<!-- tocstop -->
-
-## Test structure
+## 测试结构
 
 ```js
 describe('makePoniesPink', () => {
   beforeAll(() => {
-    /* Runs before all tests */
+    /* 在所有 test 之前执行 */
   })
   afterAll(() => {
-    /* Runs after all tests */
+    /* 在所有 test 完成后执行 */
   })
   beforeEach(() => {
-    /* Runs before each test */
+    /* 在每个 test 之前执行 */
   })
   afterEach(() => {
-    /* Runs after each test */
+    /* 在每个 test 之后执行 */
   })
 
   test('make each pony pink', () => {
     const actual = fn(['Alice', 'Bob', 'Eve'])
-    expect(actual).toEqual(['Pink Alice', 'Pink Bob', 'Pink Eve'])
+    expect(actual).toEqual(
+      ['Pink Alice', 'Pink Bob', 'Pink Eve']
+    )
   })
 })
 ```
 
-## Matchers
+## 匹配器
 
-[Using matchers](http://jestjs.io/docs/en/using-matchers), [matchers docs](https://facebook.github.io/jest/docs/expect.html)
+[Using matchers](http://jestjs.io/docs/en/using-matchers)
 
-### Basic matchers
+[matchers docs](https://facebook.github.io/jest/docs/expect.html)
+
+### 基础匹配
 
 ```js
-expect(42).toBe(42) // Strict equality (===)
-expect(42).not.toBe(3) // Strict equality (!==)
-expect([1, 2]).toEqual([1, 2]) // Deep equality
-expect({ a: undefined, b: 2 }).toEqual({ b: 2 }) // Deep equality
-expect({ a: undefined, b: 2 }).not.toStrictEqual({ b: 2 }) // Strict equality (Jest 23+)
+expect(42).toBe(42) // ===
+expect(42).not.toBe(3) // !==
+expect([1, 2]).toEqual([1, 2]) // 深度相等
+expect({ a: undefined, b: 2 }).toEqual({ b: 2 }) // 深度相等
+expect({ a: undefined, b: 2 }).not.toStrictEqual({ b: 2 }) // 严格相等 (Jest 23+)
 ```
 
-### Truthiness
+### 真值匹配
 
 ```js
-// Matches anything that an if statement treats as true (not false, 0, '', null, undefined, NaN)
+// 匹配为 true (非 false, 0, '', null, undefined, NaN)
 expect('foo').toBeTruthy()
-// Matches anything that an if statement treats as false (false, 0, '', null, undefined, NaN)
+// 匹配为 false (false, 0, '', null, undefined, NaN)
 expect('').toBeFalsy()
-// Matches only null
+// 只匹配 null
 expect(null).toBeNull()
-// Matches only undefined
+// 只匹配 undefined
 expect(undefined).toBeUndefined()
-// The opposite of toBeUndefined
+// 匹配不是 undefined
 expect(7).toBeDefined()
 ```
 
-### Numbers
+### 数字
 
 ```js
 expect(2).toBeGreaterThan(1)
@@ -115,25 +73,32 @@ expect(1).toBeLessThanOrEqual(1)
 expect(0.2 + 0.1).toBeCloseTo(0.3, 5)
 ```
 
-### Strings
+### 字符串
 
 ```js
 expect('long string').toMatch('str')
 expect('coffee').toMatch(/ff/)
 expect('pizza').not.toMatch('coffee')
-expect(['pizza', 'coffee']).toEqual([expect.stringContaining('zz'), expect.stringMatching(/ff/)])
+expect(['pizza', 'coffee']).toEqual(
+  [
+    expect.stringContaining('zz'),
+    expect.stringMatching(/ff/)
+  ]
+)
 ```
 
-### Arrays
+### 数组
 
 ```js
 expect(['Alice', 'Bob', 'Eve']).toHaveLength(3)
 expect(['Alice', 'Bob', 'Eve']).toContain('Alice')
 expect([{ a: 1 }, { a: 2 }]).toContainEqual({ a: 1 })
-expect(['Alice', 'Bob', 'Eve']).toEqual(expect.arrayContaining(['Alice', 'Bob']))
+expect(['Alice', 'Bob', 'Eve']).toEqual(
+  expect.arrayContaining(['Alice', 'Bob'])
+)
 ```
 
-### Objects
+### 对象
 
 ```js
 expect({ a: 1 }).toHaveProperty('a')
@@ -144,69 +109,55 @@ expect({ a: 1, b: 2 }).toMatchObject({
   a: expect.any(Number),
   b: expect.any(Number)
 })
-expect([{ a: 1 }, { b: 2 }]).toEqual([
-  expect.objectContaining({ a: expect.any(Number) }),
-  expect.anything()
-])
+expect([{ a: 1 }, { b: 2 }]).toEqual(
+  [
+    expect.objectContaining({a: expect.any(Number)}),
+    expect.anything()
+  ]
+)
 ```
 
-### Exceptions
+### 异常
 
 ```js
-// const fn = () => { throw new Error('Out of cheese!') }
+// const fn = () => {
+//   throw new Error('Out of cheese!')
+// }
 expect(fn).toThrow()
 expect(fn).toThrow('Out of cheese')
 expect(fn).toThrowErrorMatchingSnapshot()
 ```
 
-<details>
-  <summary>Aliases</summary>
-
-- `toThrowError` → `toThrow`
-  </details>
-
-### Snapshots
+### 快照
 
 ```js
 expect(node).toMatchSnapshot()
-// Jest 23+
 expect(user).toMatchSnapshot({
   date: expect.any(Date)
 })
 expect(user).toMatchInlineSnapshot()
 ```
 
-### Mock functions
+### 模拟函数
 
 ```js
 // const fn = jest.fn()
-// const fn = jest.fn().mockName('Unicorn') -- named mock, Jest 22+
-expect(fn).toBeCalled() // Function was called
-expect(fn).not.toBeCalled() // Function was *not* called
-expect(fn).toHaveBeenCalledTimes(1) // Function was called only once
-expect(fn).toBeCalledWith(arg1, arg2) // Any of calls was with these arguments
-expect(fn).toHaveBeenLastCalledWith(arg1, arg2) // Last call was with these arguments
-expect(fn).toHaveBeenNthCalledWith(args) // Nth call was with these arguments (Jest 23+)
-expect(fn).toHaveReturnedTimes(2) // Function was returned without throwing an error (Jest 23+)
-expect(fn).toHaveReturnedWith(value) // Function returned a value (Jest 23+)
-expect(fn).toHaveLastReturnedWith(value) // Last function call returned a value (Jest 23+)
-expect(fn).toHaveNthReturnedWith(value) // Nth function call returned a value (Jest 23+)
-expect(fn.mock.calls).toEqual([['first', 'call', 'args'], ['second', 'call', 'args']]) // Multiple calls
-expect(fn.mock.calls[0][0](1)).toBe(2) // fn.mock.calls[0][0] — the first argument of the first call
-```
-
-<details>
-  <summary>Aliases</summary>
-
-- `toBeCalled` → `toHaveBeenCalled`
-- `toBeCalledWith` → `toHaveBeenCalledWith`
-- `lastCalledWith` → `toHaveBeenLastCalledWith`
-- `nthCalledWith` → `toHaveBeenNthCalledWith`
-- `toReturnTimes` → `toHaveReturnedTimes`
-- `toReturnWith` → `toHaveReturnedWith`
-- `lastReturnedWith` → `toHaveLastReturnedWith`
-- `nthReturnedWith` → `toHaveNthReturnedWith`
-  </details>
+// const fn = jest.fn().mockName('Unicorn')
+expect(fn).toBeCalled() // 函数被调用
+expect(fn).not.toBeCalled() // 函数没被调用
+expect(fn).toHaveBeenCalledTimes(1) // 函数只被调一次
+expect(fn).toBeCalledWith(arg1, arg2) // 带参数调用
+expect(fn).toHaveBeenLastCalledWith(arg1, arg2) // 最后一次调用的参数
+expect(fn).toHaveBeenNthCalledWith(args) // 某次调用使用参数
+expect(fn).toHaveReturnedTimes(2) // 调用 2 次没报错
+expect(fn).toHaveReturnedWith(value) // 调用返回值
+expect(fn).toHaveLastReturnedWith(value) // 最后一次调用返回值
+expect(fn).toHaveNthReturnedWith(value) // 某次调用返回值
+expect(fn.mock.calls).toEqual([
+  ['first', 'call', 'args'],
+  ['second', 'call', 'args']
+]) // 多次调用
+expect(fn.mock.calls[0][0](1)).toBe(2)
 
 ### Misc
 
