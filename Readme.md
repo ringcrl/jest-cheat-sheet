@@ -1,12 +1,10 @@
-<div align="center" markdown="1">
+<!--jest-cheat-sheet-->
 
-  <img src="https://d3vv6lp55qjaqc.cloudfront.net/items/2D2K45312x0M1q2C0a3P/jest-logo.svg" width="200">
+Jest 小抄，翻译自 [jest-cheat-sheet](https://github.com/sapegin/jest-cheat-sheet)。
 
-  <h1>Jest 小抄</h1>
+<!--more-->
 
-</div>
-
-## 测试结构
+# 测试结构
 
 ```js
 describe('makePoniesPink', () => {
@@ -32,13 +30,13 @@ describe('makePoniesPink', () => {
 })
 ```
 
-## 匹配器
+# 使用方法
 
 [Using matchers](http://jestjs.io/docs/en/using-matchers)
 
 [matchers docs](https://facebook.github.io/jest/docs/expect.html)
 
-### 基础匹配
+## 基础匹配
 
 ```js
 expect(42).toBe(42) // ===
@@ -48,7 +46,7 @@ expect({ a: undefined, b: 2 }).toEqual({ b: 2 }) // 深度相等
 expect({ a: undefined, b: 2 }).not.toStrictEqual({ b: 2 }) // 严格相等 (Jest 23+)
 ```
 
-### 真值匹配
+## 真值匹配
 
 ```js
 // 匹配为 true (非 false, 0, '', null, undefined, NaN)
@@ -63,7 +61,7 @@ expect(undefined).toBeUndefined()
 expect(7).toBeDefined()
 ```
 
-### 数字
+## 数字
 
 ```js
 expect(2).toBeGreaterThan(1)
@@ -73,7 +71,7 @@ expect(1).toBeLessThanOrEqual(1)
 expect(0.2 + 0.1).toBeCloseTo(0.3, 5)
 ```
 
-### 字符串
+## 字符串
 
 ```js
 expect('long string').toMatch('str')
@@ -87,7 +85,7 @@ expect(['pizza', 'coffee']).toEqual(
 )
 ```
 
-### 数组
+## 数组
 
 ```js
 expect(['Alice', 'Bob', 'Eve']).toHaveLength(3)
@@ -98,7 +96,7 @@ expect(['Alice', 'Bob', 'Eve']).toEqual(
 )
 ```
 
-### 对象
+## 对象
 
 ```js
 expect({ a: 1 }).toHaveProperty('a')
@@ -117,7 +115,7 @@ expect([{ a: 1 }, { b: 2 }]).toEqual(
 )
 ```
 
-### 异常
+## 异常
 
 ```js
 // const fn = () => {
@@ -128,7 +126,7 @@ expect(fn).toThrow('Out of cheese')
 expect(fn).toThrowErrorMatchingSnapshot()
 ```
 
-### 快照
+## 快照
 
 ```js
 expect(node).toMatchSnapshot()
@@ -138,7 +136,7 @@ expect(user).toMatchSnapshot({
 expect(user).toMatchInlineSnapshot()
 ```
 
-### 模拟函数
+## 函数
 
 ```js
 // const fn = jest.fn()
@@ -159,26 +157,28 @@ expect(fn.mock.calls).toEqual([
 ]) // 多次调用
 expect(fn.mock.calls[0][0](1)).toBe(2)
 
-### Misc
-
-```js
 expect(new A()).toBeInstanceOf(A)
 expect(() => {}).toEqual(expect.any(Function))
-expect('pizza').toEqual(expect.anything())
 ```
 
-### Promise matchers (Jest 20+)
+## 异步
+
+[resolves docs](https://facebook.github.io/jest/docs/en/expect.html#resolves)
+
+### resolve
 
 ```js
 test('resolve to lemon', () => {
+  // 调用了一定数量的断言，确保异步代码调用次数
   expect.assertions(1)
-  // Make sure to add a return statement
+
+  // 确保要写 return
   return expect(Promise.resolve('lemon')).resolves.toBe('lemon')
   // return expect(Promise.reject('octopus')).rejects.toBeDefined();
 })
 ```
 
-Or with async/await:
+### async/await resolve
 
 ```js
 test('resolve to lemon', async () => {
@@ -188,21 +188,19 @@ test('resolve to lemon', async () => {
 })
 ```
 
-[resolves docs](https://facebook.github.io/jest/docs/en/expect.html#resolves)
+### 预期的断言
 
-## Async tests
+[更多的例子](https://facebook.github.io/jest/docs/en/tutorial-async.html)
 
-See [more examples](https://facebook.github.io/jest/docs/en/tutorial-async.html) in Jest docs.
-
-It’s a good practice to specify a number of expected assertions in async tests, so the test will fail if your assertions weren’t called at all.
+在异步测试中指定一些预期的断言是一个好习惯，如果根本没有调用断言，测试将失败。
 
 ```js
 test('async test', () => {
-  expect.assertions(3) // Exactly three assertions are called during a test
-  // OR
-  expect.hasAssertions() // At least one assertion is called during a test
+  expect.assertions(3) // 在测试期间调用了三个断言
+  // 或者
+  expect.hasAssertions() // 在测试期间至少调用一个断言
 
-  // Your async tests
+  // 你的 async tests
 })
 ```
 
@@ -218,7 +216,7 @@ test('async test', async () => {
 
 ### Promises
 
-_Return_ a Promise from your test:
+在你的 test 中返回一个 Promise
 
 ```js
 test('async test', () => {
@@ -229,9 +227,9 @@ test('async test', () => {
 })
 ```
 
-### done() callback
+### done() 回调
 
-Wrap your assertions in try/catch block, otherwise Jest will ignore failures:
+将您的断言包装在 `try/catch` 块中，否则 Jest 将忽略失败：
 
 ```js
 test('async test', done => {
@@ -249,24 +247,24 @@ test('async test', done => {
 })
 ```
 
-## Mocks
+## 模拟
 
-### Mock functions
+### 模拟函数
 
 ```js
 test('call the callback', () => {
   const callback = jest.fn()
   fn(callback)
   expect(callback).toBeCalled()
-  expect(callback.mock.calls[0][1].baz).toBe('pizza') // Second argument of the first call
+  expect(callback.mock.calls[0][1].baz).toBe('pizza') // 第一次调用的第二个参数
 })
 ```
 
-You can also use snapshots:
+您还可以使用快照：
 
 ```js
 test('call the callback', () => {
-  const callback = jest.fn().mockName('Unicorn') // mockName is available in Jest 22+
+  const callback = jest.fn().mockName('Unicorn')
   fn(callback)
   expect(callback).toMatchSnapshot()
   // ->
@@ -276,166 +274,67 @@ test('call the callback', () => {
 })
 ```
 
-And pass an implementation to `jest.fn` function:
+并将实现传递给 `jest.fn` 函数：
 
 ```js
 const callback = jest.fn(() => true)
 ```
 
-[Mock functions docs](https://facebook.github.io/jest/docs/mock-function-api.html)
+[Mock functions 文档](https://facebook.github.io/jest/docs/mock-function-api.html)
 
-### Mock modules using `jest.mock` method
+### `jest.mock`模拟模块
 
 ```js
-jest.mock('lodash/memoize', () => a => a) // The original lodash/memoize should exist
-jest.mock('lodash/memoize', () => a => a, { virtual: true }) // The original lodash/memoize isn’t required
+jest.mock('lodash/memoize', () => a => a) // 原始的 lodash/memoize 应该存在
+jest.mock('lodash/memoize', () => a => a, { virtual: true }) // 原始的 lodash/memoize 不是必需的
 ```
 
-[jest.mock docs](https://facebook.github.io/jest/docs/jest-object.html#jestmockmodulename-factory-options)
+[jest.mock 文档](https://facebook.github.io/jest/docs/jest-object.html#jestmockmodulename-factory-options)
 
-> Note: When using `babel-jest`, calls to `jest.mock` will automatically be hoisted to the top of the code block. Use `jest.doMock` if you want to explicitly avoid this behavior.
+### 模拟文件模拟模块
 
-### Mock modules using a mock file
+- 创建一个文件 `__mocks__/lodash/memoize.js`:
 
-1.  Create a file like `__mocks__/lodash/memoize.js`:
+  ```js
+  module.exports = a => a
+  ```
 
-    ```js
-    module.exports = a => a
-    ```
-
-2.  Add to your test:
+- 加入你的 test
 
     ```js
     jest.mock('lodash/memoize')
     ```
 
-> Note: When using `babel-jest`, calls to `jest.mock` will automatically be hoisted to the top of the code block. Use `jest.doMock` if you want to explicitly avoid this behavior.
-
 [Manual mocks docs](https://facebook.github.io/jest/docs/manual-mocks.html)
 
-### Mock object methods
+## 定时器
+
+为使用本机定时器函数（`setTimeout`，`setInterval`，`clearTimeout`，`clearInterval`）的代码编写同步测试。
 
 ```js
-const spy = jest.spyOn(ajax, 'request').mockImplementation(() => Promise.resolve({ success: true }))
-expect(spy).toHaveBeenCalled()
-spy.mockRestore()
-```
-
-### Mock getters and setters (Jest 22.1.0+)
-
-```js
-const location = {}
-const getTitle = jest.spyOn(location, 'title', 'get').mockImplementation(() => 'pizza')
-const setTitle = jest.spyOn(location, 'title', 'set').mockImplementation(() => {})
-```
-
-### Mock getters and setters
-
-```js
-const getTitle = jest.fn(() => 'pizza')
-const setTitle = jest.fn()
-const location = {}
-Object.defineProperty(location, 'title', {
-  get: getTitle,
-  set: setTitle
-})
-```
-
-### Clearing and restoring mocks
-
-For one mock:
-
-```js
-fn.mockClear() // Clears mock usage date (fn.mock.calls, fn.mock.instances)
-fn.mockReset() // Clears and removes any mocked return values or implementations
-fn.mockRestore() // Resets and restores the initial implementation
-```
-
-> Note: `mockRestore` works only with mocks created by `jest.spyOn`.
-
-For all mocks:
-
-```js
-jest.clearAllMocks()
-jest.resetAllMocks()
-jest.restoreAllMocks()
-```
-
-### Accessing the original module when using mocks
-
-```js
-jest.mock('fs')
-const fs = require('fs') // Mocked module
-const fs = require.requireActual('fs') // Original module
-```
-
-### Timer mocks
-
-Write synchronous test for code that uses native timer functions (`setTimeout`, `setInterval`, `clearTimeout`, `clearInterval`).
-
-```js
-// Enable fake timers
+// 启用假定时器
 jest.useFakeTimers()
 
 test('kill the time', () => {
   const callback = jest.fn()
-  // Run some code that uses setTimeout or setInterval
+  // 运行一些使用setTimeout或setInterval的代码
   const actual = someFunctionThatUseTimers(callback)
-  // Fast-forward until all timers have been executed
+  // 快进直到所有计时器都被执行
   jest.runAllTimers()
-  // Check the results synchronously
+  // 同步检查结果
   expect(callback).toHaveBeenCalledTimes(1)
 })
 ```
 
-Use [jest.runOnlyPendingTimers()](https://jestjs.io/docs/en/timer-mocks#run-pending-timers) for special cases.
+[jest.runOnlyPendingTimers() 例子](https://jestjs.io/docs/en/timer-mocks#run-pending-timers)
 
-Or adjust timers by time with [advanceTimersByTime()](https://jestjs.io/docs/en/timer-mocks#advance-timers-by-time).
+ [advanceTimersByTime() 例子](https://jestjs.io/docs/en/timer-mocks#advance-timers-by-time)
 
-## Data-driven tests (Jest 23+)
 
-Run the same test with different data:
 
-```js
-test.each([[1, 1, 2], [1, 2, 3], [2, 1, 3]])('.add(%s, %s)', (a, b, expected) => {
-  expect(a + b).toBe(expected)
-})
-```
+## 副作用模块
 
-Or the same using template literals:
-
-```js
-test.each`
-  a    | b    | expected
-  ${1} | ${1} | ${2}
-  ${1} | ${2} | ${3}
-  ${2} | ${1} | ${3}
-`('returns $expected when $a is added $b', ({ a, b, expected }) => {
-  expect(a + b).toBe(expected)
-})
-```
-
-[test.each() docs](https://facebook.github.io/jest/docs/en/api.html#testeachtable-name-fn)
-
-## Skipping tests
-
-Don’t run these tests:
-
-```js
-describe.skip('makePoniesPink'...
-tests.skip('make each pony pink'...
-```
-
-Run only these tests:
-
-```js
-describe.only('makePoniesPink'...
-tests.only('make each pony pink'...
-```
-
-## Testing modules with side effects
-
-Node.js and Jest will cache modules you `require`. To test modules with side effects you’ll need to reset the module registry between tests:
+Node.js和Jest将缓存你需要的模块，要测试具有副作用的模块，您需要在测试之后重置模块注册表
 
 ```js
 const modulePath = '../module-to-test'
@@ -445,47 +344,37 @@ afterEach(() => {
 })
 
 test('first test', () => {
-  // Prepare conditions for the first test
+  // 准备第一次测试的条件
   const result = require(modulePath)
   expect(result).toMatchSnapshot()
 })
 
 test('second text', () => {
-  // Prepare conditions for the second test
+  // 准备第二次测试的条件
   const fn = () => require(modulePath)
   expect(fn).toThrow()
 })
 ```
 
-## Usage with Babel and TypeScript
+# Babel 和 TypeScript
 
-Add [babel-jest](https://github.com/facebook/jest/tree/master/packages/babel-jest) or [ts-jest](https://github.com/kulshekhar/ts-jest). Check their docs for installation instructions.
+[babel-jest](https://github.com/facebook/jest/tree/master/packages/babel-jest)
 
-## Resources
+[ts-jest](https://github.com/kulshekhar/ts-jest)
 
-- [Jest site](https://facebook.github.io/jest/)
-- [Testing React components with Jest and Enzyme](http://blog.sapegin.me/all/react-jest) by Artem Sapegin
-- [React Testing Examples](https://react-testing-examples.com/)
-- [Testing React Applications](https://youtu.be/59Ndb3YkLKA) by Max Stoiber
-- [Effective Snapshot Testing](https://blog.kentcdodds.com/effective-snapshot-testing-e0d1a2c28eca) by Kent C. Dodds
-- [Migrating to Jest](https://medium.com/@kentcdodds/migrating-to-jest-881f75366e7e#.pc4s5ut6z) by Kent C. Dodds
-- [Migrating AVA to Jest](http://browniefed.com/blog/migrating-ava-to-jest/) by Jason Brown
-- [How to Test React and MobX with Jest](https://semaphoreci.com/community/tutorials/how-to-test-react-and-mobx-with-jest) by Will Stern
-- [Testing React Intl components with Jest and Enzyme](https://medium.com/@sapegin/testing-react-intl-components-with-jest-and-enzyme-f9d43d9c923e) by Artem Sapegin
-- [Testing with Jest: 15 Awesome Tips and Tricks](https://medium.com/@stipsan/testing-with-jest-15-awesome-tips-and-tricks-42150ec4c262) by Stian Didriksen
-- Taking Advantage of Jest Matchers by Ben McCormick: [Part 1](https://benmccormick.org/2017/08/15/jest-matchers-1/), [Part 2](https://benmccormick.org/2017/09/04/jest-matchers-2/)
+# 资源
 
----
+- [Jest 官网](https://facebook.github.io/jest/)
+- [使用Jest和Enzyme测试React组件](http://blog.sapegin.me/all/react-jest)
+- [React 测试示例](https://react-testing-examples.com/)
+- [测试 React 应用程序](https://youtu.be/59Ndb3YkLKA)
+- [有效的快照测试](https://blog.kentcdodds.com/effective-snapshot-testing-e0d1a2c28eca)
+- [迁移到 jest](https://medium.com/@kentcdodds/migrating-to-jest-881f75366e7e#.pc4s5ut6z)
+- [如何使用 Jest 测试 React 和 MobX](https://semaphoreci.com/community/tutorials/how-to-test-react-and-mobx-with-jest)
+- [使用 Jest 和 Enzyme 测试 React Intl 组件](https://medium.com/@sapegin/testing-react-intl-components-with-jest-and-enzyme-f9d43d9c923e)
+- [用 Jest 测试：15个奇妙的技巧和窍门](https://medium.com/@stipsan/testing-with-jest-15-awesome-tips-and-tricks-42150ec4c262)
 
-## You may also like
-
-- [Opinionated list of React components](https://github.com/sapegin/react-components)
-
-## Contributing
-
-Improvements are welcome! Open an issue or send a pull request.
-
-## Author and license
+# Author and license
 
 [Artem Sapegin](http://sapegin.me/), a frontend developer at [Wayfair](https://tech.wayfair.com/) and the creator of [React Styleguidist](https://github.com/styleguidist/react-styleguidist). I also write about frontend at [my blog](http://blog.sapegin.me/).
 
